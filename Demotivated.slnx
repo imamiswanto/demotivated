@@ -1,3 +1,6 @@
 <Solution>
   <Project Path="Demotivated.Api/Demotivated.Api.csproj" />
+  <Project Path="Demotivated.Domain/Demotivated.Domain.csproj" />
+  <Project Path="Demotivated.Infrastructure/Demotivated.Infrastructure.csproj" />
+  <Project Path="Demotivated.Tests/Demotivated.Tests.csproj" />
 </Solution>
