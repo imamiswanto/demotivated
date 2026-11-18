@@ -12,6 +12,7 @@ public class StockMovementConfiguration
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Type)
+            .HasConversion<string>()
             .IsRequired()
             .HasMaxLength(30);
 
@@ -24,11 +25,26 @@ public class StockMovementConfiguration
         builder.Property(x => x.Notes)
             .HasMaxLength(500);
 
+        builder.Property(x => x.ReferenceType)
+            .HasMaxLength(50);
+
         builder.ToTable(table =>
         {
             table.HasCheckConstraint(
                 "CK_StockMovements_Quantity_NonZero",
                 "\"Quantity\" <> 0");
+
+            table.HasCheckConstraint(
+                "CK_StockMovements_StockBefore_NonNegative",
+                "\"StockBefore\" >= 0");
+
+            table.HasCheckConstraint(
+                "CK_StockMovements_StockAfter_NonNegative",
+                "\"StockAfter\" >= 0");
+
+            table.HasCheckConstraint(
+                "CK_StockMovements_StockConsistency",
+                "\"StockAfter\" = \"StockBefore\" + \"Quantity\"");
         });
 
         builder.HasOne(x => x.ProductVariant)

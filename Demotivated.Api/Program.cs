@@ -1,5 +1,23 @@
 using Demotivated.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Demotivated.Application.Abstractions.Repositories;
+using Demotivated.Infrastructure.Repositories;
+using Demotivated.Application.Features.Collections.CreateCollection;
+using Demotivated.Application.Features.Collections.GetCollections;
+using Demotivated.Application.Features.Collections.GetCollectionById;
+using Demotivated.Application.Features.Collections.UpdateCollection;
+using Demotivated.Application.Features.Collections.DeleteCollection;
+using Demotivated.Application.Features.Categories.CreateCategory;
+using Demotivated.Application.Features.Categories.UpdateCategory;
+using Demotivated.Application.Features.Categories.GetCategories;
+using Demotivated.Application.Features.Categories.GetCategoryById;
+using Demotivated.Application.Features.Categories.DeleteCategory;
+using Demotivated.Application.Features.Products.CreateProduct;
+using Demotivated.Application.Features.Products.GetProducts;
+using Demotivated.Application.Features.Products.GetProductById;
+using Demotivated.Application.Features.Products.UpdateProduct;
+/*using Demotivated.Application.Features.Products.DeleteProduct;*/
+using Demotivated.Application.Features.StockAdjustments.CreateStockAdjustment;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,42 +25,51 @@ builder.Services.AddDbContext<DemotivatedDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+//Collection
+builder.Services.AddScoped<ICollectionRepository, CollectionRepository>();
+builder.Services.AddScoped<CreateCollectionHandler>();
+builder.Services.AddScoped<GetCollectionsHandler>();
+builder.Services.AddScoped<DeleteCollectionHandler>();
+builder.Services.AddScoped<GetCollectionByIdHandler>();
+builder.Services.AddScoped<UpdateCollectionHandler>();
+
+// Category
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<CreateCategoryHandler>();
+builder.Services.AddScoped<UpdateCategoryHandler>();
+builder.Services.AddScoped<GetCategoriesHandler>();
+builder.Services.AddScoped<GetCategoryByIdHandler>();
+builder.Services.AddScoped<DeleteCategoryHandler>();
+
+// Product
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IStockAdjustmentRepository, StockAdjustmentRepository>();
+builder.Services.AddScoped<CreateProductHandler>();
+builder.Services.AddScoped<GetProductsHandler>();
+builder.Services.AddScoped<GetProductByIdHandler>();
+builder.Services.AddScoped<UpdateProductHandler>();
+/*builder.Services.AddScoped<DeleteProductHandler>();*/
+builder.Services.AddScoped<CreateStockAdjustmentHandler>();
+
+builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint(
+            "/openapi/v1.json",
+            "Demotivated API v1");
+    });
 }
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.MapControllers();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

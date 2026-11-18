@@ -21,6 +21,10 @@ public class ProductImageConfiguration
         builder.Property(x => x.SortOrder)
             .HasDefaultValue(0);
 
+        builder.HasIndex(x => x.ProductId)
+            .IsUnique()
+            .HasFilter("\"IsPrimary\" = true");
+
         builder.HasOne(x => x.Product)
             .WithMany(x => x.Images)
             .HasForeignKey(x => x.ProductId)

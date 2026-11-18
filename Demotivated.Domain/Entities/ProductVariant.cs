@@ -12,6 +12,8 @@ public class ProductVariant
 
     public int Stock { get; set; } = 0;
 
+    public bool IsActive { get; set; } = true;
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     // Navigation Property

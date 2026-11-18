@@ -4,6 +4,13 @@
 
 # Visual Studio
 .vs/
-
-# VS Code
 .vscode/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+**/secrets.json
+
+# Local configuration
+**/appsettings.*.local.json
