@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Demotivated.Domain\Demotivated.Domain.csproj" />
+    <ProjectReference Include="..\Demotivated.Application\Demotivated.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

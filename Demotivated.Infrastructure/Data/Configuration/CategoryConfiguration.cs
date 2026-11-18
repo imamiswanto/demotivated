@@ -2,7 +2,7 @@ using Demotivated.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Demotivated.Infrastructure.Data.Configurations;
+namespace Demotivated.Infrastructure.Data.Configuration;
 
 public class CategoryConfiguration
     : IEntityTypeConfiguration<Category>
@@ -21,12 +21,7 @@ public class CategoryConfiguration
         builder.Property(x => x.IsActive)
             .HasDefaultValue(true);
 
-        builder.HasIndex(x => new { x.CollectionId, x.Name })
+        builder.HasIndex(x => x.Name)
             .IsUnique();
-
-        builder.HasOne(x => x.Collection)
-            .WithMany()
-            .HasForeignKey(x => x.CollectionId)
-            .OnDelete(DeleteBehavior.Restrict);
     }
 }

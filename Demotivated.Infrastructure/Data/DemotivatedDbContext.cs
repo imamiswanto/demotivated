@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Demotivated.Infrastructure.Data;
 
+
 public class DemotivatedDbContext : DbContext
 {
     public DemotivatedDbContext(
@@ -17,6 +18,9 @@ public class DemotivatedDbContext : DbContext
     public DbSet<ProductVariant> ProductVariants => Set<ProductVariant>();
     public DbSet<ProductImage> ProductImages => Set<ProductImage>();
     public DbSet<StockMovement> StockMovements => Set<StockMovement>();
+    public DbSet<CollectionCategory> CollectionCategories
+        => Set<CollectionCategory>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

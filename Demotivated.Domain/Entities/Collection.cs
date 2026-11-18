@@ -11,4 +11,8 @@ public class Collection
     public bool IsActive { get; set; } = true;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    // Navigation Property
+    public ICollection<CollectionCategory> CollectionCategories { get; set; }
+        = new List<CollectionCategory>();
 }

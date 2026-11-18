@@ -28,9 +28,6 @@ namespace Demotivated.Infrastructure.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("CollectionId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -50,7 +47,7 @@ namespace Demotivated.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CollectionId", "Name")
+                    b.HasIndex("Name")
                         .IsUnique();
 
                     b.ToTable("Categories");
@@ -87,6 +84,21 @@ namespace Demotivated.Infrastructure.Data.Migrations
                     b.ToTable("Collections");
                 });
 
+            modelBuilder.Entity("Demotivated.Domain.Entities.CollectionCategory", b =>
+                {
+                    b.Property<Guid>("CollectionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("CollectionId", "CategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("CollectionCategories");
+                });
+
             modelBuilder.Entity("Demotivated.Domain.Entities.Product", b =>
                 {
                     b.Property<Guid>("Id")
@@ -94,6 +106,9 @@ namespace Demotivated.Infrastructure.Data.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CollectionId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Color")
@@ -109,7 +124,9 @@ namespace Demotivated.Infrastructure.Data.Migrations
                         .HasColumnType("character varying(2000)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -122,9 +139,17 @@ namespace Demotivated.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.HasIndex("CategoryId", "Name");
 
-                    b.ToTable("Products");
+                    b.HasIndex("CollectionId", "CategoryId");
+
+                    b.ToTable("Products", t =>
+                        {
+                            t.HasCheckConstraint("CK_Product_Price_NonNegative", "\"Price\" >= 0");
+                        });
                 });
 
             modelBuilder.Entity("Demotivated.Domain.Entities.ProductImage", b =>
@@ -156,7 +181,9 @@ namespace Demotivated.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("ProductId")
+                        .IsUnique()
+                        .HasFilter("\"IsPrimary\" = true");
 
                     b.ToTable("ProductImages");
                 });
@@ -169,6 +196,11 @@ namespace Demotivated.Infrastructure.Data.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
@@ -208,6 +240,9 @@ namespace Demotivated.Infrastructure.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Notes")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
@@ -222,6 +257,16 @@ namespace Demotivated.Infrastructure.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<string>("ReferenceType")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("StockAfter")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("StockBefore")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -234,16 +279,30 @@ namespace Demotivated.Infrastructure.Data.Migrations
                     b.ToTable("StockMovements", t =>
                         {
                             t.HasCheckConstraint("CK_StockMovements_Quantity_NonZero", "\"Quantity\" <> 0");
+
+                            t.HasCheckConstraint("CK_StockMovements_StockAfter_NonNegative", "\"StockAfter\" >= 0");
+
+                            t.HasCheckConstraint("CK_StockMovements_StockBefore_NonNegative", "\"StockBefore\" >= 0");
+
+                            t.HasCheckConstraint("CK_StockMovements_StockConsistency", "\"StockAfter\" = \"StockBefore\" + \"Quantity\"");
                         });
                 });
 
-            modelBuilder.Entity("Demotivated.Domain.Entities.Category", b =>
+            modelBuilder.Entity("Demotivated.Domain.Entities.CollectionCategory", b =>
                 {
+                    b.HasOne("Demotivated.Domain.Entities.Category", "Category")
+                        .WithMany("CollectionCategories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Demotivated.Domain.Entities.Collection", "Collection")
-                        .WithMany()
+                        .WithMany("CollectionCategories")
                         .HasForeignKey("CollectionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Category");
 
                     b.Navigation("Collection");
                 });
@@ -256,7 +315,21 @@ namespace Demotivated.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Demotivated.Domain.Entities.Collection", "Collection")
+                        .WithMany()
+                        .HasForeignKey("CollectionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Demotivated.Domain.Entities.CollectionCategory", null)
+                        .WithMany()
+                        .HasForeignKey("CollectionId", "CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Category");
+
+                    b.Navigation("Collection");
                 });
 
             modelBuilder.Entity("Demotivated.Domain.Entities.ProductImage", b =>
@@ -290,6 +363,16 @@ namespace Demotivated.Infrastructure.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("ProductVariant");
+                });
+
+            modelBuilder.Entity("Demotivated.Domain.Entities.Category", b =>
+                {
+                    b.Navigation("CollectionCategories");
+                });
+
+            modelBuilder.Entity("Demotivated.Domain.Entities.Collection", b =>
+                {
+                    b.Navigation("CollectionCategories");
                 });
 
             modelBuilder.Entity("Demotivated.Domain.Entities.Product", b =>

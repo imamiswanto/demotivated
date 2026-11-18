@@ -6,6 +6,8 @@ public class Product
 
     public Guid CategoryId { get; set; }
 
+    public Guid CollectionId { get; set; }
+
     public string Name { get; set; } = string.Empty;
 
     public string? Description { get; set; }
@@ -19,6 +21,8 @@ public class Product
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     // Navigation Properties
+    public Collection? Collection { get; set; }
+
     public Category? Category { get; set; }
 
     public ICollection<ProductVariant> Variants { get; set; }

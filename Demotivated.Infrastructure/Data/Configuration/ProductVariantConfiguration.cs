@@ -29,6 +29,9 @@ public class ProductVariantConfiguration
                 "\"Stock\" >= 0");
         });
 
+        builder.Property(x => x.IsActive)
+            .HasDefaultValue(true);
+
         builder.HasOne(x => x.Product)
             .WithMany(x => x.Variants)
             .HasForeignKey(x => x.ProductId)

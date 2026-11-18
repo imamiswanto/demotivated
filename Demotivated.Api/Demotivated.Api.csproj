@@ -13,10 +13,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.3.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Demotivated.Infrastructure\Demotivated.Infrastructure.csproj" />
+    <ProjectReference Include="..\Demotivated.Application\Demotivated.Application.csproj" />
   </ItemGroup>
 
 </Project>
