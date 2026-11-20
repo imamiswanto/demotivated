@@ -18,6 +18,8 @@ using Demotivated.Application.Features.Products.GetProductById;
 using Demotivated.Application.Features.Products.UpdateProduct;
 /*using Demotivated.Application.Features.Products.DeleteProduct;*/
 using Demotivated.Application.Features.StockAdjustments.CreateStockAdjustment;
+using Demotivated.Application.Features.StockMovements.GetStockMovements;
+using Demotivated.Application.Features.StockMovements.GetStockMovementById;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,8 +53,14 @@ builder.Services.AddScoped<UpdateProductHandler>();
 /*builder.Services.AddScoped<DeleteProductHandler>();*/
 builder.Services.AddScoped<CreateStockAdjustmentHandler>();
 
+//Stock Movement
+builder.Services.AddScoped<IStockMovementRepository, StockMovementRepository>();
+builder.Services.AddScoped<GetStockMovementsHandler>();
+builder.Services.AddScoped<GetStockMovementByIdHandler>();
+
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+
 
 var app = builder.Build();
 
